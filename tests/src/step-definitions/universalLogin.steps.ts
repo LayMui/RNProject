@@ -1,6 +1,6 @@
 
 import { DataTable, Given, Then, When } from '@cucumber/cucumber'
-import { Actor, notes} from '@serenity-js/core';
+import { Actor, actorCalled, actorInTheSpotlight, notes} from '@serenity-js/core';
 import HomePage from '../page-objects/HomePage';
 import LoginPage from '../page-objects/LoginPage';
 import LogoutPage from '../page-objects/LogoutPage';
@@ -26,7 +26,7 @@ Then('{pronoun} is able to perform OTP', async function (actor: Actor) {
       const vendor = 'twilio';
       const hmac = await OTPPage.generateHMAC({ recipient: recipient, environment: environment, vendor: vendor })
       console.log('HMAC: ' + hmac);
-      await actor.attemptsTo(
+      await actorCalled('James').attemptsTo(
          ReadSMS.withCredentials(hmac, recipient, this.env, vendor, false),
         // notes().set('vendor', vendor),
          )
