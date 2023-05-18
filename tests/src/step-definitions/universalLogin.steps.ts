@@ -9,13 +9,8 @@ import { ReadSMS } from '../tasks/ReadSMS';
 import { ChangeApiConfig } from '@serenity-js/rest';
 import OTPPage from '../page-objects/OTPPage';
 
-Given('{actor} is at the universal login for tenant {string} and {string} and {string} in lang {string}', 
-async function (actor: Actor, app: string, region: string,  env: string, lang: string) {
-  await HomePage.selectWebViewLangEnvRegionApp(lang, env, region, app)
-  // Remember the app selected
-  this.app = app;
-  this.env = env;
-  await HomePage.webViewLogin()
+Given('{actor} is at the home app', 
+async function (actor: Actor) {
   await actor.attemptsTo(
     ChangeApiConfig.setUrlTo(
         'https://usermanagement-sms.stage.xxx.xxxxx.io'   
@@ -25,15 +20,11 @@ async function (actor: Actor, app: string, region: string,  env: string, lang: s
 
  
 Then('{pronoun} is able to perform OTP', async function (actor: Actor) {
-  switch(this.app) {
-    case 'mxpEurope':
-
-      break;
-    default:
       await setTimeout(5000, 'resolved');
-      const recipient = this.countryCode + this.mobileNumber;
+      const recipient = '+6596666666';
+      const environment = "stage";
       const vendor = 'twilio';
-      const hmac = await OTPPage.generateHMAC({ recipient: recipient, environment: this.env, vendor: vendor })
+      const hmac = await OTPPage.generateHMAC({ recipient: recipient, environment: environment, vendor: vendor })
       console.log('HMAC: ' + hmac);
       await actor.attemptsTo(
          ReadSMS.withCredentials(hmac, recipient, this.env, vendor, false),
@@ -41,10 +32,6 @@ Then('{pronoun} is able to perform OTP', async function (actor: Actor) {
          )
      
       const OTP = await OTPPage.readOTP(this.countryCode + this.mobileNumber);
-      await OTPPage.enterOTPInput(this.app, OTP);
-      await LogoutPage.logout();
-    break;
-  }
 });
 
 
